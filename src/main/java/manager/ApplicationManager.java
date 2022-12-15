@@ -18,7 +18,7 @@ public class ApplicationManager {
 
     public void init() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("load-extension=C:Tools/5.3.2_0");
+        options.addArguments("load-extension=C:/Tools/5.3.2_0");
         wd = new ChromeDriver(options);
 
 
