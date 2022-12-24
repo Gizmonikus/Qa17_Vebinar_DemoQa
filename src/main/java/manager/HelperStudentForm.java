@@ -1,17 +1,12 @@
 package manager;
 
 import models.Student;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 
 public class HelperStudentForm extends HelperBase {
-
-
     public HelperStudentForm(WebDriver wd) {
         super(wd);
     }
@@ -34,14 +29,38 @@ public class HelperStudentForm extends HelperBase {
         selectBDay(student.getBirthday());
         addSubjects(student.getSubject());
         selectHobby(student.getHobbies());
+        type(By.id("currentAddress"), student.getAddress());
+        typeState(student.getState());
+        typeCity(student.getCity());
+
 
     }
 
+    private void typeCity(String city) {
+        //type(By.id("react-select-4-input"), city);//window.scrollBy(0,400);
+        wd.findElement(By.id("react-select-4-input")).sendKeys(city);
+        wd.findElement(By.id("react-select-4-input")).sendKeys(Keys.ENTER);
+    }
+
+    private void typeState(String state) {
+       // type(By.id("react-select-3-input"), state);
+        Dimension dimension = wd.manage().window().getSize();
+        System.out.printf("Height --->" + dimension.getHeight());
+
+        JavascriptExecutor js = (JavascriptExecutor) wd;
+        js.executeScript("window.scrollBy(0,400);");
+
+
+        // type(By.id("react-select-3-input"),state);
+        wd.findElement(By.id("react-select-3-input")).sendKeys(state);
+        wd.findElement(By.id("react-select-3-input")).sendKeys(Keys.ENTER);
+    }
+
     private void selectHobby(String hobbies) {
-        //label[for='hobbies-checkbox-1']
-        String [] all = hobbies.split(",");
-        for(String s:all){
-            switch (s){
+        // label[for='hobbies-checkbox-1']
+        String[] all = hobbies.split(",");
+        for (String s : all) {
+            switch (s) {
                 case "Sports":
                     click(By.cssSelector("label[for='hobbies-checkbox-1']"));
                     break;
@@ -67,10 +86,13 @@ public class HelperStudentForm extends HelperBase {
             el.sendKeys(sub);
             el.sendKeys(Keys.ENTER);
             pause(1000);
+
         }
+
+
     }
 
-    private void selectBDay(String birthday) {//30 June 2000 ===> ("30") ("June") ("2000")
+    private void selectBDay(String birthday) { // 30 June 2000  === > ["30"] ["June"] ["2000"]
         WebElement dbirth = wd.findElement(By.id("dateOfBirthInput"));
         dbirth.click();
 
@@ -79,11 +101,11 @@ public class HelperStudentForm extends HelperBase {
         new Select(wd.findElement(By.cssSelector("select.react-datepicker__month-select"))).selectByVisibleText(data[1]);
         new Select(wd.findElement(By.cssSelector("select.react-datepicker__year-select"))).selectByValue(data[2]);
 
-        //String locator = "//div[text()='30']"; как пришли к последнему варианту
-        //String locator = "//div[text()='"+"30"+"']";
+        //String locator = "//div[text()='30']";
+        // String locator = "//div[text()='"+"30"+"']";
         String locator = "//div[text()='" + data[0] + "']";
 
-        String locator2 = String.format("//div[text()='%s']", data[0]);//%s - то, что мы заменяем
+        String locator2 = String.format("//div[text()='%s']", data[0]);
 
         List<WebElement> list = wd.findElements(By.xpath(locator2));
         if (list.size() > 1 && Integer.parseInt(data[0]) > 14) {
@@ -92,31 +114,48 @@ public class HelperStudentForm extends HelperBase {
             list.get(0).click();
         }
 
+
         //click(By.xpath(locator));
     }
+
 
     private void typeBDay(String birthday) {
         WebElement dbirth = wd.findElement(By.id("dateOfBirthInput"));
         dbirth.click();
 
-        String nameOS = System.getProperty("os.name");  //"Mac ..."
+        String nameOS = System.getProperty("os.name");   // "Mac "
         System.out.printf(nameOS);
         if (nameOS.startsWith("Mac")) {
-            dbirth.sendKeys(Keys.chord(Keys.CONTROL, "a"));//для винды
+            dbirth.sendKeys(Keys.chord(Keys.COMMAND, "a"));
         } else {
-            dbirth.sendKeys(Keys.chord(Keys.COMMAND, "a"));//для мака
+            dbirth.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         }
         dbirth.sendKeys(birthday);
         dbirth.sendKeys(Keys.ENTER);
+
     }
 
     private void selectGender(String gender) {
-        if (gender.equals("Male")){
+        if (gender.equals("Male")) {
             click(By.cssSelector("label[for='gender-radio-1']"));
-        }else if (gender.equals("Female")){
+        } else if (gender.equals("Female")) {
             click(By.cssSelector("label[for='gender-radio-2']"));
-        }else if (gender.equals("Other")){
+        } else if (gender.equals("Other")) {
             click(By.cssSelector("label[for='gender-radio-3']"));
         }
+    }
+
+    public void uploadPhoto(String link) {
+        wd.findElement(By.id("uploadPicture")).sendKeys(link);
+    }
+
+    public void submitForm() {
+        click(By.id("submit"));
+    }
+
+    public void hideFooter() {
+        JavascriptExecutor js = (JavascriptExecutor) wd;
+        js.executeScript("document.querySelector('footer').style.display='none';");
+
     }
 }
